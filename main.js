@@ -34,7 +34,7 @@ function getParts(file, start, end) {
 // We use Promise.all to merge BOTH the .wasm and the .pck simultaneously
 Promise.all([
     mergeFiles(getParts("index.wasm", 1, 2)), // Merges index.wasm.part1, .part2
-    mergeFiles(getParts("index.pck", 1, 2))   // Merges index.pck.part1, .part2
+    mergeFiles(getParts("index.pck", 1, 8))   // Merges index.pck.part1, .part2
 ]).then(([wasmUrl, pckUrl]) => {
     
     window.fetch = async function (url, ...args) {
