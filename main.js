@@ -30,15 +30,27 @@ function getParts(file, start, end) {
     }
     return parts;
 }
+
+// We use Promise.all to merge BOTH the .wasm and the .pck simultaneously
 Promise.all([
-    mergeFiles(getParts("index.wasm", 1, 2))
-]).then(([ wasmUrl]) => {
+    mergeFiles(getParts("index.wasm", 1, 2)), // Merges index.wasm.part1, .part2
+    mergeFiles(getParts("index.pck", 1, 2))   // Merges index.pck.part1, .part2
+]).then(([wasmUrl, pckUrl]) => {
+    
     window.fetch = async function (url, ...args) {
+        // Redirect the engine to the merged WASM blob
         if (url.endsWith("index.wasm")) {
             return originalFetch(wasmUrl, ...args);
-        } else {
+        } 
+        // Redirect the engine to the merged PCK blob
+        else if (url.endsWith("index.pck")) {
+            return originalFetch(pckUrl, ...args);
+        } 
+        // Everything else loads normally
+        else {
             return originalFetch(url, ...args);
         }
     };
+
     window.godotRunStart();
 });
